@@ -2,8 +2,8 @@
   <div class="app-container">
     <!--工具栏-->
     <div class="head-container">
-      <eHeader :dict="dict" :permission="permission" />
-      <crudOperation :permission="permission" />
+      <eHeader :dict="dict" :permission="permission" crud-tag="job" />
+      <crudOperation :permission="permission" crud-tag="job" />
     </div>
     <!--表格渲染-->
     <el-table ref="table" v-loading="crud.loading" :data="crud.data" style="width: 100%;" @selection-change="crud.selectionChangeHandler">
@@ -46,14 +46,15 @@
           <udOperation
             :data="scope.row"
             :permission="permission"
+            crud-tag="job"
           />
         </template>
       </el-table-column>
     </el-table>
     <!--分页组件-->
-    <pagination />
+    <pagination crud-tag="job" />
     <!--表单渲染-->
-    <eForm :job-status="dict.job_status" />
+    <eForm :job-status="dict.job_status" crud-tag="job" />
   </div>
 </template>
 
@@ -68,6 +69,7 @@ import udOperation from '@crud/UD.operation'
 
 // crud交由presenter持有
 const crud = CRUD({
+  tag: 'job',
   title: '岗位',
   url: 'api/job',
   sort: ['sort,asc', 'id,desc'],

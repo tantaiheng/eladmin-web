@@ -4,7 +4,7 @@
       <!--左侧插槽-->
       <slot name="left" />
       <el-button
-        v-if="crud.optShow.add"
+        v-if="features.indexOf('c') !== -1"
         v-permission="permission.add"
         class="filter-item"
         size="mini"
@@ -15,7 +15,7 @@
         新增
       </el-button>
       <el-button
-        v-if="crud.optShow.edit"
+        v-if="features.indexOf('u') !== -1"
         v-permission="permission.edit"
         class="filter-item"
         size="mini"
@@ -27,7 +27,7 @@
         修改
       </el-button>
       <el-button
-        v-if="crud.optShow.del"
+        v-if="features.indexOf('d') !== -1"
         slot="reference"
         v-permission="permission.del"
         class="filter-item"
@@ -41,7 +41,7 @@
         删除
       </el-button>
       <el-button
-        v-if="crud.optShow.download"
+        v-if="features.indexOf('e') !== -1"
         :loading="crud.downloadLoading"
         :disabled="!crud.data.length"
         class="filter-item"
@@ -55,6 +55,7 @@
     </span>
     <el-button-group class="crud-opts-right">
       <el-button
+        v-if="searchToggle"
         size="mini"
         plain
         type="info"
@@ -62,11 +63,13 @@
         @click="toggleSearch()"
       />
       <el-button
+        v-if="features.indexOf('r') !== -1"
         size="mini"
         icon="el-icon-refresh"
         @click="crud.refresh()"
       />
       <el-popover
+        v-if="filter"
         placement="bottom-end"
         width="150"
         trigger="click"
@@ -108,7 +111,23 @@ export default {
     permission: {
       type: Object,
       default: () => { return {} }
+    },
+    features: {
+      type: String,
+      default: () => 'crude'
+    },
+    searchToggle: {
+      type: Boolean,
+      default: () => true
+    },
+    filter: {
+      type: Boolean,
+      default: () => true
     }
+    // crudId: {
+    //   type: String,
+    //   default: () => 'crud'
+    // }
   },
   data() {
     return {
