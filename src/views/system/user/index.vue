@@ -66,9 +66,22 @@
             </el-select>
             <rrOperation />
           </div>
-          <crudOperation show="" :permission="permission" />
+          <crudOperation show="" :permission="permission">
+            <template slot="right">
+              <el-button
+                class="filter-item"
+                size="mini"
+                type="primary"
+                icon="el-icon-plus"
+                @click="onAddJob"
+              >
+                新增岗位
+              </el-button>
+            </template>
+          </crudOperation>
         </div>
         <!--表单渲染-->
+        <jobForm :job-status="dict.job_status" crud-tag="job" />
         <el-dialog append-to-body :close-on-click-modal="false" :before-close="crud.cancelCU" :visible.sync="crud.status.cu > 0" :title="crud.status.title" width="570px">
           <el-form ref="form" :inline="true" :model="form" :rules="rules" size="small" label-width="66px">
             <el-form-item label="用户名" prop="username">
@@ -195,6 +208,8 @@
 
 <script>
 import crudUser from '@/api/system/user'
+import crudJob from '@/api/system/job'
+import jobForm from '../job/module/form'
 import { isvalidPhone } from '@/utils/validate'
 import { getDepts } from '@/api/system/dept'
 import { getAll, getLevel } from '@/api/system/role'
@@ -211,13 +226,14 @@ import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 let userRoles = []
 // crud交由presenter持有
 const defaultCrud = CRUD({ title: '用户', url: 'api/users', crudMethod: { ...crudUser }})
-const defaultForm = { id: null, username: null, nickName: null, sex: '男', email: null, enabled: 'false', roles: [], job: { id: null }, dept: { id: null }, phone: null }
+const defaultJobCrud = CRUD({ tag: 'job', title: '岗位', url: 'api/job', sort: ['sort,asc', 'id,desc'], crudMethod: { ...crudJob }})
+const defaultForm = { username: null, nickName: null, sex: '男', email: null, enabled: 'false', roles: [], job: { id: null }, dept: { id: null }, phone: null }
 export default {
   name: 'User',
-  components: { Treeselect, crudOperation, rrOperation, udOperation, pagination },
-  mixins: [presenter(defaultCrud), header(), form(defaultForm), crud()],
+  components: { Treeselect, crudOperation, rrOperation, udOperation, pagination, jobForm },
+  mixins: [presenter(defaultCrud), presenter(defaultJobCrud, 'job'), header(), form(defaultForm), crud()],
   // 数据字典
-  dicts: ['user_status'],
+  dicts: ['user_status', 'job_status'],
   data() {
     // 自定义验证
     const validPhone = (rule, value, callback) => {
@@ -352,6 +368,11 @@ export default {
       crud.form.roles = userRoles
       return true
     },
+    [CRUD.HOOK.afterValidateCU + '$' + defaultJobCrud.tag](crud, form) {
+      console.log('这里是新增岗位的验证通过后钩子')
+      debugger
+      return true
+    },
     // 获取左侧部门数据
     getDeptDatas() {
       const sort = 'id,desc'
@@ -417,6 +438,9 @@ export default {
     },
     checkboxT(row, rowIndex) {
       return row.id !== this.user.id
+    },
+    onAddJob() {
+      defaultJobCrud.toAdd()
     }
   }
 }
